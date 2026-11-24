@@ -1,0 +1,170 @@
+===============================================================================
+COMFYUI + KAGGLE SETUP - ESSENTIAL STEPS
+===============================================================================
+
+QUICK START (3 COMMANDS):
+=========================
+
+1. Clone & Setup:
+   git clone https://github.com/yourusername/comfyui-kaggle-project.git
+   cd comfyui-kaggle-project
+
+2. Download models:
+   python scripts/download_models.py
+
+3. Launch ComfyUI:
+   python scripts/launch_comfyui.py
+
+VISIT: http://localhost:8188
+
+===============================================================================
+===============================================================================
+
+COMPLETE ROADMAP:
+=================
+See comfyui_kaggle_setup_roadmap.md for detailed 10-phase setup guide.
+
+===============================================================================
+===============================================================================
+
+KAGGLE SETUP (Required):
+==========================
+
+1. Get credentials from: https://www.kaggle.com/account?tab=apikeys
+
+2. Create ~/.kaggle directory:
+   mkdir -p ~/.kaggle
+
+3. Place kaggle.json there (rename if needed)
+
+4. Set permissions:
+   chmod 600 ~/.kaggle/kaggle.json
+
+5. Test:
+   kaggle --version
+   kaggle datasets list
+
+Sync models from Kaggle:
+   python scripts/kaggle_sync.py --mode custom
+   python scripts/kaggle_sync.py --mode outputs
+
+===============================================================================
+===============================================================================
+
+STORAGE/DRIVE SETUP:
+=====================
+
+Recommended structure:
+├── models/          (~30GB)  # SD models, ControlNet, custom models
+├── outputs/generated (~20GB) # Generated images
+├── outputs/temporary (~5GB)  # Cache files
+├── ComfyUI/web/     (already included)
+└── logs/            (small)
+
+You need ~50GB+ storage space.
+
+Check disk space:
+   python scripts/storage_monitor.py
+
+===============================================================================
+===============================================================================
+
+GITHUB INTEGRATION:
+====================
+
+Initialize Git (if you create your own repo):
+   git init
+   git add .
+   git commit -m "Initial commit"
+   git remote add origin https://github.com/yourusername/comfyui-kaggle-project.git
+   git push -u origin main
+
+Workflow with generated images:
+   git add outputs/generated/your_project/
+   git commit -m "Add generated images: your_project"
+   git push origin main
+
+IMPORTANT: Add *.safetensors to .gitignore before committing models!
+
+===============================================================================
+===============================================================================
+
+KEY SCRIPTS:
+============
+
+scripts/download_models.py    - Download SD models, ControlNet, etc.
+scripts/kaggle_sync.py         - Sync with Kaggle (models, outputs)
+scripts/storage_monitor.py     - Monitor storage usage
+scripts/launch_comfyui.py      - Launch and check ComfyUI setup
+
+CONFIGURATION FILES:
+====================
+
+workflows/text_to_image.json    - Basic SD workflow
+workflows/control_net_workflow.json  - ControlNet workflow
+workflows/custom_model_workflow.json - Custom model workflow
+
+DOCUMENTATION:
+==============
+
+README.md                   - Project overview and quick reference
+setup_guide.md             - Step-by-step setup guide
+comfyui_kaggle_setup_roadmap.md - Complete roadmap (10 phases)
+
+===============================================================================
+===============================================================================
+
+USAGE EXAMPLES:
+===============
+
+Basic Text-to-Image:
+1. Launch: python scripts/launch_comfyui.py
+2. Open: http://localhost:8188
+3. Load: workflows/text_to_image.json
+4. Edit prompt, click "Execute"
+
+ControlNet (pose/drawing guided):
+1. Load: workflows/control_net_workflow.json
+2. Upload control image
+3. Edit prompt
+4. Click "Execute"
+
+Custom Model:
+1. Load: workflows/custom_model_workflow.json
+2. Point to your custom model (.safetensors)
+3. Edit prompt
+4. Click "Execute"
+
+===============================================================================
+===============================================================================
+
+TROUBLESHOOTING:
+================
+
+Port 8188 in use:
+   python scripts/launch_comfyui.py --port 8189
+
+Models not found:
+   python scripts/launch_comfyui.py --check-only
+
+Kaggle auth error:
+   ls -la ~/.kaggle/kaggle.json
+   chmod 600 ~/.kaggle/kaggle.json
+
+Low storage:
+   python scripts/storage_monitor.py
+
+===============================================================================
+===============================================================================
+
+NEXT STEPS:
+===========
+
+1. Read: README.md - Quick overview
+2. Read: comfyui_kaggle_setup_roadmap.md - Full setup guide
+3. Run:  python scripts/download_models.py - Download your first models
+4. Setup: Kaggle API credentials
+5. Launch: python scripts/launch_comfyui.py - Start creating!
+
+===============================================================================
+===============================================================================

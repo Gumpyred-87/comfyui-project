@@ -1,0 +1,125 @@
+{
+    "name": "Custom Fine-tuned Model Workflow",
+    "version": "1.0",
+    "author": "ComfyUI Project",
+    "date_created": "2026-11-24T00:00:00Z",
+    "description": "Workflow for using custom or fine-tuned models with ComfyUI",
+    "nodes": [
+        {
+            "name": "EmptyLatentImage",
+            "type": "EmptyLatentImage",
+            "position": [100, 100],
+            "parameters": {
+                "batch_size": 1,
+                "width": 512,
+                "height": 512
+            }
+        },
+        {
+            "name": "Base Prompt",
+            "type": "CLIPTextEncode",
+            "position": [300, 100],
+            "parameters": {
+                "clip": ["CLIPModel", 0],
+                "text": "custom subject, unique style, detailed, high quality",
+                "clip_skip": 1
+            }
+        },
+        {
+            "name": "Negative Prompt",
+            "type": "CLIPTextEncode",
+            "position": [100, 500],
+            "parameters": {
+                "clip": ["CLIPModel", 0],
+                "text": "blurry, low quality, distorted, bad anatomy, watermark",
+                "clip_skip": 1
+            }
+        },
+        {
+            "name": "KSampler",
+            "type": "KSampler",
+            "position": [400, 100],
+            "parameters": {
+                "model": ["ModelLoader", 0],
+                "positive_prompt": ["Base Prompt", "out"],
+                "negative_prompt": ["Negative Prompt", "out"],
+                "sampler_name": "euler",
+                "scheduler": "simple",
+                "num_inference_steps": 25,
+                "guidance": 8.0,
+                "seed": 12345,
+                "batch_size": 1
+            }
+        },
+        {
+            "name": "VAEEncode",
+            "type": "VAEEncode",
+            "position": [250, 350],
+            "parameters": {
+                "samples": ["KSampler", "out"],
+                "vae": ["VAE", 0]
+            }
+        },
+        {
+            "name": "LoadModel",
+            "type": "CheckpointLoaderSimple",
+            "position": [50, 200],
+            "parameters": {
+                "ckpt_name": "custom/model.safetensors"
+            }
+        },
+        {
+            "name": "LoadCartoonVAE",
+            "type": "VAELoader",
+            "position": [250, 200],
+            "parameters": {}
+        },
+        {
+            "name": "VAEDecode",
+            "type": "VAEDecode",
+            "position": [400, 350],
+            "parameters": {
+                "samples": ["VAEEncode", "out"],
+                "vae": ["LoadCartoonVAE", "out"]
+            }
+        },
+        {
+            "name": "ImageSave",
+            "type": "SaveImage",
+            "position": [550, 350],
+            "parameters": {
+                "images": ["VAEDecode", "out"],
+                "filename_prefix": "comfyui_custom_",
+                "folder": "generated"
+            }
+        },
+        {
+            "name": "LoadLoRA",
+            "type": "LoRA",
+            "position": [200, 0],
+            "parameters": {
+                "model": ["CheckpointLoaderSimple", "out"],
+                "lopath": "custom/lora.safetensors",
+                "strength": 0.8
+            }
+        },
+        {
+            "name": "ApplyLoRA",
+            "type": "LoraLoader",
+            "position": [350, 0],
+            "parameters": {
+                "model": ["LoadModel", "out"],
+                "lora": ["LoadLoRA", "lora"],
+                "strength": 0.8
+            }
+        },
+        {
+            "name": "CLIPModel",
+            "type": "CheckpointLoaderSimple",
+            "position": [50, 400],
+            "parameters": {
+                "ckpt_name": "sd_v1_5/model.safetensors"
+            }
+        }
+    ]
+}
