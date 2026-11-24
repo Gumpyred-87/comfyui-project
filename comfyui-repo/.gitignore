@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Models (large files to exclude from public repo)
+*.safetensors
+*.ckpt
+*.pth
+*.bin
+*.model
+models/stable_diffusion/
+models/control_nets/
+models/custom/
+
+# Outputs (generated images)
+outputs/generated/
+outputs/temporary/
+*.jpg
+*.jpeg
+*.png
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary
+*.tmp
+*.temp
+temp/
+cache/
+
+# Environment
+.env
+.env.local
+*.env
+
+# Downloads
+downloads/
+*.zip
+*.tar.gz

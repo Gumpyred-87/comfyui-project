@@ -1,0 +1,123 @@
+{
+    "name": "ControlNet Workflow",
+    "version": "1.0",
+    "author": "ComfyUI Project",
+    "date_created": "2026-11-24T00:00:00Z",
+    "description": "Text-to-image workflow with ControlNet conditioning",
+    "nodes": [
+        {
+            "name": "EmptyLatentImage",
+            "type": "EmptyLatentImage",
+            "position": [100, 100],
+            "parameters": {
+                "batch_size": 1,
+                "width": 512,
+                "height": 512
+            }
+        },
+        {
+            "name": "Prompt",
+            "type": "CLIPTextEncode",
+            "position": [300, 100],
+            "parameters": {
+                "clip": ["CLIPModel", 0],
+                "text": "beautiful portrait, professional headshot, studio lighting",
+                "clip_skip": 1
+            }
+        },
+        {
+            "name": "NegativePrompt",
+            "type": "CLIPTextEncode",
+            "position": [100, 600],
+            "parameters": {
+                "clip": ["CLIPModel", 0],
+                "text": "blurry, low quality, distorted, text, watermark",
+                "clip_skip": 1
+            }
+        },
+        {
+            "name": "KSampler",
+            "type": "KSampler",
+            "position": [500, 100],
+            "parameters": {
+                "model": ["ModelLoader", 0],
+                "positive_prompt": ["Prompt", "out"],
+                "negative_prompt": ["NegativePrompt", "out"],
+                "sampler_name": "euler",
+                "scheduler": "simple",
+                "num_inference_steps": 20,
+                "guidance": 7.5,
+                "seed": 42,
+                "batch_size": 1
+            }
+        },
+        {
+            "name": "VAEEncode",
+            "type": "VAEEncode",
+            "position": [300, 300],
+            "parameters": {
+                "samples": ["KSampler", "out"],
+                "vae": ["VAE", 0]
+            }
+        },
+        {
+            "name": "LoadControlNet",
+            "type": "ControlNetLoader",
+            "position": [100, 400],
+            "parameters": {
+                "control_net_name": "controlnet_v1_3/model.safetensors"
+            }
+        },
+        {
+            "name": "LoadImage",
+            "type": "LoadImage",
+            "position": [100, 800],
+            "parameters": {
+                "image": "control_image.png"
+            }
+        },
+        {
+            "name": "ApplyControlNet",
+            "type": "ControlNetApply",
+            "position": [300, 400],
+            "parameters": {
+                "control_net": ["LoadControlNet", "out"],
+                "control_image": ["LoadImage", 0],
+                "strength": 0.8
+            }
+        },
+        {
+            "name": "VAEDecode",
+            "type": "VAEDecode",
+            "position": [500, 300],
+            "parameters": {
+                "samples": ["VAEEncode", "out"],
+                "vae": ["VAE", 0]
+            }
+        },
+        {
+            "name": "ImageSave",
+            "type": "SaveImage",
+            "position": [700, 300],
+            "parameters": {
+                "images": ["VAEDecode", "out"],
+                "filename_prefix": "comfyui_controlnet_",
+                "folder": "generated"
+            }
+        },
+        {
+            "name": "CLIPModel",
+            "type": "CheckpointLoaderSimple",
+            "position": [100, 1200],
+            "parameters": {
+                "ckpt_name": "sd_v1_5/model.safetensors"
+            }
+        },
+        {
+            "name": "VAE",
+            "type": "VAELoader",
+            "position": [300, 1200],
+            "parameters": {}
+        }
+    ]
+}
